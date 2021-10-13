@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+instance
+
+fit-union-324504-8305b813e2b8.json

@@ -1,0 +1,2 @@
+class SurveyHandler():
+    pass
