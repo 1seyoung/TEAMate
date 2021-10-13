@@ -1,0 +1,2 @@
+class scoreCheckHandler():
+    pass
