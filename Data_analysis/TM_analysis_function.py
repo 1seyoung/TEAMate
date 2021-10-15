@@ -1,10 +1,12 @@
 from datetime import timedelta
 from re import I
 from matplotlib.pyplot import text
-from numpy import False_, NaN, int16
+from numpy import False_, NaN, copysign, int16
 import pygsheets
 import pandas as pd
 from decimal import Decimal
+import copy
+#import TM_analysis_graph_ as graph
 
 def make_df(group_id):
     json_file_name = 'fit-union-324504-8305b813e2b8.json'
@@ -77,8 +79,7 @@ def name_score_clear (name_score) :
     return name_score
 
 def double_plus(a,b) :
-    return Decimal(str(a))+Decimal(str(b))
-
+    return round(float(str(a))+float(str(b)) , 1)
 
 def set_score(text, name_score) :
   count = len(text['chat'])
@@ -127,7 +128,8 @@ def all_score(ty, length) :
     return 0
 
 def main():
-    data_text = make_df(-472653938)
+      
+    data_text = make_df(-433015856)
 
     name = list(set(data_text['user_id']))
     name_score = []
@@ -141,14 +143,16 @@ def main():
     pop_check = 0
 
     result_score = []
+
     for i in range(len(data_text)) :
-        if pop_check != data_text.at[i,'timeblock'] :
-            #table_print.collect_msg(pop_check, name, list(name_score.values()))
-            #print(pop_check, name_score)
-            result_score.append(name_score)
-            name_score = name_score_clear(name_score)
-            pop_check += 1
-        #print(data_text.loc[i, :])
-        name_score = set_score(data_text.loc[i, :], name_score)
-    print(result_score)
+      if pop_check != data_text.at[i,'timeblock'] :
+        result_score.append(name_score)
+        name_score = name_score_clear(copy.deepcopy(name_score))
+        pop_check += 1
+
+      name_score = set_score(data_text.loc[i, :], name_score)
+          
+    result_score.append(name_score)
     return result_score
+
+main()
