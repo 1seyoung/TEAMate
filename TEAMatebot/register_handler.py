@@ -1,25 +1,43 @@
 from telegram import Update
-from telegram.ext import Dispatcher,CommandHandler,MessageHandler,Filters,ConversationHandler,CallbackContext
+from telegram.ext import Dispatcher,CommandHandler,MessageHandler,Filters,ConversationHandler,CallbackContext 
 
 
 from pygsheets import Spreadsheet
 class RegisterHandler():
-    
     def __init__(self, state_map:dict, sh:Spreadsheet):
         self.state_map = state_map
+        print(state_map)
         self.sh =sh
 
         self.handler = ConversationHandler(
-            entry_points=[CommandHandler('team_register',self.register_start)]
-        )
+            entry_points=[CommandHandler('team_register', self.register_start)],
+            states={
+                self.state_map["GET_STUDENT_ID"]: [
+                    #MessageHandler(Filters.text & ~(Filters.command), self.check_user),
+                    MessageHandler(
+                        Filters.regex(r'\d{8}'), self.check_user
+                
+                        #오류,,,ㅜㅜ nlog(n)-> heapsort ,,,
+                    ),
+                    MessageHandler(Filters.text & ~(Filters.command | Filters.regex(r'\d{8}')), self.wrong_data),
+                    #CommandHandler('team_register', self.check_user)
+                ],
+                self.state_map["ID_CHECKED"]: [
+                    MessageHandler(
+                        Filters.text & ~(Filters.command), self.check_pwd
+                    )
+                ]
+            },
+            fallbacks=[CommandHandler('cancel', self.cancel)],)
 
     def get_handler(self) -> Dispatcher:
         return self.handler
 
     def get_help(self):
-        return f"/team_register :  자신의 정보와 참가중인 팀 정보를 등록합니다."
+        
+        return f"/team_register :  자신의 정보와 참가중인 팀 정보를 등록합니다. 그룹 채팅방에서는 사용할 수 없습니다. 봇을 친구 추가한 뒤 대화를 걸고 이용해주세요"
 
-    def cancle(self, update: Update, context: CallbackContext) -> int:
+    def cancel(self, update: Update, context: CallbackContext) -> int:
         #이전으로 돌아가기
         #전체 취소 차이가  코드 차이 알아보기
         context.user_data.clear()
@@ -27,6 +45,66 @@ class RegisterHandler():
         return ConversationHandler.END
     
     def register_start(self,update: Update, context: CallbackContext) -> int:
-        update.message.reply_text("학번을 입력해주세요.")
-        context.user_data['next_state']="GET_STUDENT_ID"
-        return self.state_map[context.user_data["next_state"]]
+        if update.message.chat_id < 0:
+            context.bot.send_message(chat_id=update.message.chat_id, text="그룹채팅방에서는 사용할 수 없는 기능입니다. \n TEAMAtebot과의 개인 채팅을 이용해주세요 ")
+            return ConversationHandler.END
+        else:
+            print("!")
+            update.message.reply_text("학번을 입력해주세요.")
+            context.user_data['next_state'] = "GET_STUDENT_ID"
+            return self.state_map[context.user_data['next_state']]
+
+    def check_user(self, update: Update, context: CallbackContext) -> int:
+        print("check user")
+        print(update.message.text)
+        user_id = int(update.message.text)
+        if (row := self.check_wks_stuid(user_id)) > 0:
+            context.user_data['id'] = user_id        
+            context.user_data['row'] = row + 2
+            context.user_data['next_state'] = "ID_CHECKED"
+
+            update.message.reply_text("비밀번호를 입력해주세요.")
+            return self.state_map[context.user_data['next_state']]
+        else:
+            update.message.reply_text("수강신청 등록이 안된 사용자입니다.\n담당교수님께 확인하시길 바랍니다.")
+            context.user_data.clear()
+            return ConversationHandler.END
+
+    def check_wks_stuid(self, user_id:int) -> bool:
+    #def check_wks_stuid(self, user_id:int, pwd:str) -> bool:
+        wks = self.sh.worksheet('title','참여자 정보')
+        df = wks.get_as_df()
+
+        user_data = df.index[df['학번'] == user_id].tolist()
+        if user_data:
+            return user_data[0]
+        else:
+            return -1
+
+
+    def wrong_data(self, update: Update, context: CallbackContext) -> int:
+        print("wrong_Data")
+        update.message.reply_text("학번을 다시 입력해주세요.")
+        return self.state_map[context.user_data['next_state']]
+
+
+#수정 필요
+    def check_pwd(self, update: Update, context: CallbackContext) -> int:
+        print("check pwd")
+        if self.check_wks_pwd(context.user_data['row'],update.message.text):
+            wks =self.sh.worksheet('title','참여자 정보')
+            wks.update_value('C'+str(context.user_data['row']), update.effective_user.id)
+            
+            update.message.reply_text("챗봇 서비스에 등록되었습니다.")
+        else:
+            update.message.reply_text("비밀번호가 맞지 않습니다. \n다시 시작하길 바랍니다.")
+        
+        context.user_data.clear()
+        return ConversationHandler.END
+    
+    def check_wks_pwd(self, idx:int, pwd:str) -> bool:
+        wks = self.sh.worksheet('title','참여자 정보')
+        if wks.get_value('E'+str(idx))==pwd:
+            return True
+        else:
+            return False
