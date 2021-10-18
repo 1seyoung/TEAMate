@@ -44,6 +44,4 @@ def print_graph(score):
     #plt.show()
     plt.savefig('print_graph.png')
     
-
-
 print_graph(TM.main())
