@@ -127,6 +127,7 @@ class TelegramManager():
 	def handler_classcode_add(self, update: Update, context: CallbackContext) -> int:
 		update.message.reply_text("Classcode를 입력해주세요.")
 		if self.check_classcode(update.effective_user.id)):
+			pass
 
 	def signal_handler(self, sig, frame):
 		print("Terminating Monitoring System")
