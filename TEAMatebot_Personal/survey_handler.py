@@ -10,22 +10,7 @@ class SurveyHandler():
         print(state_map)
         self.sh =sh
 
-        self.handler = ConversationHandler(
-            entry_points=[CommandHandler('survey', self.survey_start)],
-            states={
-                self.state_map["GET_STUDENT_ID"]: [
-                    MessageHandler(
-                        Filters.regex(r'\d{8}'), self.check_user
-                    ),
-                    MessageHandler(Filters.text & ~(Filters.command | Filters.regex(r'\d{8}')), self.wrong_data),
-                ],
-                self.state_map["ID_CHECKED"]: [
-                    MessageHandler(
-                        Filters.text & ~(Filters.command), self.check_pwd
-                    )
-                ]
-            },
-            fallbacks=[CommandHandler('cancel', self.cancel)],)
+        #conversationhandler code
 
     def get_handler(self) -> Dispatcher:
         return self.handler
