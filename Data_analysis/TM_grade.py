@@ -14,8 +14,3 @@ def grade(name_score, contri, result) :
     
     return result_grade
 
-
-name_score = {1750342024: 9.8, 1739915236: 0.2}
-contri = {1750342024: 23, 1739915236: 2}
-result = 50
-print(grade(name_score, contri, result))
