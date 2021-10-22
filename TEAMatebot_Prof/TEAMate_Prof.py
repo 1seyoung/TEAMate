@@ -125,20 +125,40 @@ class TEAMatebot_Prof():
         for i in range(len(pre_data)):
             pre.append(pre_data[i])
             current.append(current_data[i])
+<<<<<<< HEAD
         x = np.arange(len(labels))  # the label locations
         width = 0.25  # the width of the bars
         fig, ax = plt.subplots()
         rects1 = ax.bar(x - width/2, pre, width, label='pre')
         rects2 = ax.bar(x + width/2, current, width, label='current')
+=======
+
+        x = np.arange(len(labels))  # the label locations
+        width = 0.25  # the width of the bars
+
+        fig, ax = plt.subplots()
+        rects1 = ax.bar(x - width/2, pre, width, label='pre')
+        rects2 = ax.bar(x + width/2, current, width, label='current')
+
+>>>>>>> c28db142fc9612dc5dda11f395578d13f73b0f5a
         # Add some text for labels, title and custom x-axis tick labels, etc.
         ax.set_ylabel('water-level')
         ax.set_title('--- flooding risk ---')
         ax.set_xticks(x)
         ax.set_xticklabels(labels)
         ax.legend()
+<<<<<<< HEAD
         # ax.bar_label(rects1, padding=3)
         # ax.bar_label(rects2, padding=3)
         fig.tight_layout()
+=======
+
+        # ax.bar_label(rects1, padding=3)
+        # ax.bar_label(rects2, padding=3)
+
+        fig.tight_layout()
+
+>>>>>>> c28db142fc9612dc5dda11f395578d13f73b0f5a
         for userid in userid_list:
             bot = TelegramBot(TELEGRAM_TOKEN, userid[0])
             if threshold == "caution":

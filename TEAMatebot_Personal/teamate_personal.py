@@ -8,8 +8,8 @@ from telegram.ext import Updater, CallbackContext,MessageHandler,Filters,Command
 from scoreCheck_handler import scoreCheckHandler
 from register_handler import RegisterHandler
 from survey_handler import SurveyHandler
-
-
+from init_handler import InitHandler
+from states import STATES
 
 from config import *
 from instance.config import *
@@ -36,6 +36,7 @@ class TEAMatebot_Personal():
                         #scoreCheckHandler(self.state_map,self.sh),
                         RegisterHandler(self.state_map,self.sh),
                         #SurveyHandler(self.state_map,self.sh)
+                        InitHandler(self.state_map,self.sh)
         ]
 
         for handler in self.handlers:
@@ -60,3 +61,6 @@ class TEAMatebot_Personal():
         update.message.reply_text(resp)    
 
 
+if __name__ == "__main__":
+    tb = TEAMatebot_Personal(STATES, TELEGRAM_API_KEY, GOOGLE_SERVICE_KEY, GOOGLE_SPREAD_SHEET)
+    tb.execute()

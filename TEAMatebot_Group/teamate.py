@@ -22,7 +22,7 @@ se.get_engine("sname").insert_input_port("start")
 se.get_engine("sname").insert_input_port("msg")
 
 # Telegram Manager Initialization
-tm = TelegramManager(se.get_engine("sname"), TELEGRAM_API_KEY_COLLECT,STATES)
+tm = TelegramManager(se.get_engine("sname"), TELEGRAM_API_KEY_COLLECT)
 
 
 # Monitoring System Start
