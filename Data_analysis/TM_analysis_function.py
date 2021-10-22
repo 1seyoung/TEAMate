@@ -9,6 +9,7 @@ import copy
 #import TM_analysis_graph_ as graph
 
 def make_df(group_id):
+    pd.set_option('mode.chained_assignment',  None)
     json_file_name = 'fit-union-324504-8305b813e2b8.json'
 
     spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1-FrwLOMx47lTOZuQZfxKdHxDl1w-HC0AvYhXv22LWGM/edit?usp=sharing'
@@ -21,7 +22,7 @@ def make_df(group_id):
 
     group_chat_df = chat_df.loc[chat_df["group_id"]==group_id]
 
-    group_chat_df["timegap"] = (group_chat_df.Datetime - group_chat_df.Datetime.shift())
+    group_chat_df['timegap'] = (group_chat_df.Datetime - group_chat_df.Datetime.shift())
 
     group_chat_df= group_chat_df.assign(timeblock = lambda x:(x['timegap']> timedelta(seconds=600)).cumsum() )
     group_chat_df = group_chat_df.dropna(axis=0)
@@ -82,13 +83,13 @@ def double_plus(a,b) :
     return round(float(str(a))+float(str(b)) , 1)
 
 def set_score(text, name_score) :
-  count = len(text['chat'])
+  count = len(str(text['chat']))
   num = add_score(name_score, text['starter'])
 
   ty = 'no_ping'
   if text['comunication'] == True :
     ty = 'timeblock'
-  if text['chat'].startswith('파일: ') :
+  if str(text['chat']).startswith('파일: ') :
     ty = 'file'
 
   name_score[text['user_id']] = double_plus(all_score(ty, count), name_score[text['user_id']])
@@ -127,14 +128,14 @@ def all_score(ty, length) :
 
     return 0
 
-def main():
+def main(group):
       
-    data_text = make_df(-433015856)
+    data_text = make_df(group)
 
     name = list(set(data_text['user_id']))
     name_score = []
     for i in range(0, len(name)) :
-        name_score.append([name[i], str(0.0)])
+      name_score.append([name[i], str(0.0)])
     
     name_score = dict(name_score)
     data_text=timeblock_starter(data_text)
@@ -153,6 +154,6 @@ def main():
       name_score = set_score(data_text.loc[i, :], name_score)
           
     result_score.append(name_score)
+    print(result_score)
     return result_score
 
-main()
