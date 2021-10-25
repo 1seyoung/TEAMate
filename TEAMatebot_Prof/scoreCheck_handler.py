@@ -1,11 +1,11 @@
 from telegram import Update
 from telegram.ext import Dispatcher,CommandHandler,MessageHandler,Filters,ConversationHandler,CallbackContext 
-import pygsheets
+
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import TM_analysis_function as TM
-
+from decimal import Decimal
 from bob_telegram_tools.bot import TelegramBot
 from pygsheets import Spreadsheet
 class scoreCheckHandler():
@@ -25,7 +25,7 @@ class scoreCheckHandler():
                 ],
                 self.state_map["TEAM_CHECKED"]: [
                     CommandHandler(
-                        'teamscore', self.handle_check_password
+                        'teamscore', self.get_graph
                     )
                 ]
             },
@@ -48,13 +48,14 @@ class scoreCheckHandler():
         df = wks.get_as_df()
 
         user_data = df.index[df['classcode'] == team_id].tolist()
+        print(user_data)
         if user_data:
             return user_data[0]
         else:
             return -1
 
     def handle_check_team(self, update: Update, context: CallbackContext) -> int:
-        print(update.message.text)
+        #print(update.message.text)
         self.team_id = str(update.message.text)
         if (row := self.check_valid_user(self.team_id)) > 0:
             context.user_data['id'] = self.team_id        
@@ -64,7 +65,7 @@ class scoreCheckHandler():
             update.message.reply_text("등록된 팀 입니다.\n 팀 점수를 확인하려면 /teamscore 을 클릭하세요 ")
             return self.state_map[context.user_data['next_state']]
         else:
-            update.message.reply_text("등록이 안된 팀입니다.\n학생들에게 다시 확인하시길 바랍니다.")
+            update.message.reply_text("없는 정보입니다.\n학생들에게 다시 확인하시길 바랍니다.")
             context.user_data.clear()
             return ConversationHandler.END   
 
@@ -79,22 +80,27 @@ class scoreCheckHandler():
         update.message.reply_text("취소 되었습니다.")
         return ConversationHandler.END
 
-    #def handle_check_password(self, update: Update, context: CallbackContext):
-    #    return self.class_group_list(self.team_id)
+    def get_graph(self,update: Update, context: CallbackContext) -> int:
+        group = self.class_group_list(self.team_id)
+        result_score = TM.main( group )
+        
+        update.message.reply_photo(self.print_graph(result_score, group))
+        return ConversationHandler.END
 
-    def class_group_list(class_id):
-        json_file_name = 'fit-union-324504-8305b813e2b8.json'
+    def class_group_list(self,class_id):
+        
+        wks = self.sh.worksheet('title','참여자 정보')
 
-        spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1-FrwLOMx47lTOZuQZfxKdHxDl1w-HC0AvYhXv22LWGM/edit?usp=sharing'
+        
+        df = wks.get_as_df()
+        
+        user_data=df.index[df['classcode'] == class_id].tolist()
+        
 
-        gc = pygsheets.authorize(service_file=json_file_name)
-        sh = gc.open('TM_DB')
-        wks = sh.worksheet('title','참여자 정보')
-
-        user_df = wks.get_as_df()
-        user_df = user_df['classcode' == class_id] 
-
-        return list(set(user_df['group_id']))
+        group_id =wks.get_value('D'+str(user_data[0]+2))
+        #user_df = user_df.loc['classcode' == str(class_id)]
+        print(group_id)
+        return group_id
     
     def print_graph(score, group_id):
         label_name=[]
@@ -147,8 +153,9 @@ class scoreCheckHandler():
         plt.savefig('print_graph' + str(group_id))
   
     def send_graph(group): ########################  group = group_id -> list
+        print("send")
         for i in group :
             result_score = TM.main(i)
             #print_graph(result_score, i)
             png_name = 'print_graph'+ str(i) +'png'
-            #TelegramBot.send_photo(chat_id=prof, photo=open(png_name, 'rb'))
+            TelegramBot.send_photo(chat_id=prof, photo=open(png_name, 'rb'))
