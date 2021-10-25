@@ -15,7 +15,7 @@ class scoreCheckHandler():
         self.sh =sh
 
         self.handler = ConversationHandler(
-            entry_points=[CommandHandler('/scorecheck', self.send_graph)],
+            entry_points=[CommandHandler('scorecheck', self.handle_score_check)],
             states={
                 self.state_map["GET_TEAM_ID"]:[
                     MessageHandler(
@@ -54,7 +54,8 @@ class scoreCheckHandler():
             return -1
 
     def handle_check_team(self, update: Update, context: CallbackContext) -> int:
-        self.team_id = int(update.message.text)
+        print(update.message.text)
+        self.team_id = str(update.message.text)
         if (row := self.check_valid_user(self.team_id)) > 0:
             context.user_data['id'] = self.team_id        
             context.user_data['row'] = row + 2
@@ -78,8 +79,8 @@ class scoreCheckHandler():
         update.message.reply_text("취소 되었습니다.")
         return ConversationHandler.END
 
-    def handle_check_password(self, update: Update, context: CallbackContext):
-        return self.class_group_list(self.team_id)
+    #def handle_check_password(self, update: Update, context: CallbackContext):
+    #    return self.class_group_list(self.team_id)
 
     def class_group_list(class_id):
         json_file_name = 'fit-union-324504-8305b813e2b8.json'
