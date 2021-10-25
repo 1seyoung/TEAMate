@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import Dispatcher,CommandHandler,MessageHandler,Filters,ConversationHandler,CallbackContext 
-
+import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -78,13 +78,17 @@ class scoreCheckHandler():
         #전체 취소 차이가  코드 차이 알아보기
         context.user_data.clear()
         update.message.reply_text("취소 되었습니다.")
+        
         return ConversationHandler.END
 
     def get_graph(self,update: Update, context: CallbackContext) -> int:
         group = self.class_group_list(self.team_id)
-        result_score = TM.main( group )
-        
-        update.message.reply_photo(self.print_graph(result_score, group))
+        group_idd = int(group)
+        result_score = TM.main(group_idd)
+        self.print_graph(result_score, group)
+        png_name = 'print_graph' + str(group) + '.png'
+        cv2.imread('png_name', cv2.IMREAD_COLOR)
+        context.bot.send_photo(chat_id=update.effective_user.id, photo=open(png_name, 'rb'))
         return ConversationHandler.END
 
     def class_group_list(self,class_id):
@@ -102,7 +106,7 @@ class scoreCheckHandler():
         print(group_id)
         return group_id
     
-    def print_graph(score, group_id):
+    def print_graph(self,score, group_id):
         label_name=[]
         
         key_ = score[0].keys()
@@ -152,10 +156,4 @@ class scoreCheckHandler():
         save_name = group_id
         plt.savefig('print_graph' + str(group_id))
   
-    def send_graph(group): ########################  group = group_id -> list
-        print("send")
-        for i in group :
-            result_score = TM.main(i)
-            #print_graph(result_score, i)
-            png_name = 'print_graph'+ str(i) +'png'
-            TelegramBot.send_photo(chat_id=prof, photo=open(png_name, 'rb'))
+
