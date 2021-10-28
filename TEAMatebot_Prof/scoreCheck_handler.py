@@ -156,4 +156,108 @@ class scoreCheckHandler():
         save_name = group_id
         plt.savefig('print_graph' + str(group_id))
   
+    def print_graph_indi(self,score, group_id):
+        label_name=[]
+        
+        key_ = score[0].keys()
+        #value_ = []
+        
+        for i in range(len(score)) :
+            label_name.append('b'+ str(i+1))
+        #label 이름 설정
+        
+        # x = np.arange(divi)
+        x = [1]
+        for i in range(1, len(key_)):
+            x.append(TM.double_plus(x[0] , 0.5*i))
+        
+        
+        # block에 따라 score 출력
+        # x축: 블록
+        # y축: 점수   
+        width = 0.5
+        c = ['slategrey', 'lightblue', 'cornflowerblue', 'royalblue', 'slateblue']
+        fig, ax = plt.subplots()
+        for idx, i in enumerate(score):
+            data = list(i.values())
+            name_g = list(i.keys())
+            if idx == 0 :
+                for idx2, j in enumerate(data) :
+                    rects1 = ax.bar(x[idx2], j, width, color=c[idx2], label = str(name_g[idx2]))
+                for k in range(0, len(key_)):
+                    x[k] += 3
+                continue
+            rects1 = ax.bar(x, data, width, color=c)
+            #for idx, item in enumerate(data):
+                
+            for k in range(0, len(key_)):
+                x[k] += 3
+        
+        plt.legend((key_))
+        x_l = []
+        x_l.append(int(len(key_)/2)+0.5)
+        for i in range(len(score)-1):
+            x_l.append(x_l[0] + 3*(i+1))
 
+        plt.xticks(x_l, labels=label_name)
+        ax.set_ylabel('Scores')
+        ax.set_title('TEAMate')
+        #plt.show()
+        save_name = group_id
+        plt.savefig('print_graph' + str(group_id))
+def print_graph_indi(score, group_id):
+    avg = []
+    for i in score :
+        value = list(i.values())
+        avg.append(round(sum(value) / len(i),2))
+
+    print(avg)
+
+    label_name=[]        
+    key_ = score[0].keys()
+    for i in range(len(score)) :
+        label_name.append('b'+ str(i+1))
+    #label 이름 설정
+    
+    data = []
+    
+    for idx, i in enumerate(key_) :
+        c_data = []
+        for j in score :
+            c_data.append(j[i])
+        if idx == 0 :  ## if else 지우기
+            data.append(c_data)
+        else : 
+            data.append([x+y for x,y in zip(data[idx-1], c_data)])
+    print(data)
+
+    # x = np.arange(divi)
+    x = [1]
+    for i in range(1, len(score)):
+        x.append(TM.double_plus(x[0] , i))
+    
+    
+    # block에 따라 score 출력
+    # x축: 블록
+    # y축: 점수   
+    width = 0.5
+    c = ['slategrey', 'lightblue', 'cornflowerblue', 'royalblue', 'slateblue']
+
+    fig, ax = plt.subplots()
+    for idx in range(len(key_)):
+        #name_g = list(i.keys())
+        rects1 = ax.bar(x, data[len(key_)-idx-1], width, color=c[idx])
+        #for idx, item in enumerate(data):
+
+    plt.legend((key_))
+    x_l = [1]
+
+    for i in range(len(score)-1):
+        x_l.append(x_l[0] + (i+1))
+
+    plt.xticks(x_l, labels=label_name)
+    ax.set_ylabel('Scores')
+    ax.set_title('TEAMate')
+    plt.show()
+    #save_name = group_id
+    #plt.savefig('print_graph' + str(group_id))
