@@ -39,6 +39,7 @@ def print_graph(score, group_id):
     width = 0.5
     c = ['slategrey', 'lightblue', 'cornflowerblue', 'royalblue', 'slateblue']
     fig, ax = plt.subplots()
+    #plt.figure(figsize=(20,10))
     for idx, i in enumerate(score):
         data = list(i.values())
         name_g = list(i.keys())
@@ -50,7 +51,6 @@ def print_graph(score, group_id):
             continue
         rects1 = ax.bar(x, data, width, color=c)
         #for idx, item in enumerate(data):
-            
         for k in range(0, len(key_)):
             x[k] += 3
     
@@ -66,6 +66,63 @@ def print_graph(score, group_id):
     #plt.show()
     save_name = group_id
     plt.savefig('print_graph' + str(group_id))
+def print_graph_indi(score, group_id):
+    avg = []
+    for i in score :
+        value = list(i.values())
+        avg.append(round(sum(value) / len(i),2))
+
+    print(avg)
+
+    label_name=[]        
+    key_ = score[0].keys()
+    for i in range(len(score)) :
+        label_name.append('b'+ str(i+1))
+    #label 이름 설정
+    
+    data = []
+    
+    for idx, i in enumerate(key_) :
+        c_data = []
+        for j in score :
+            c_data.append(j[i])
+        if idx == 0 :
+            data.append(c_data)
+        else : 
+            data.append([x+y for x,y in zip(data[idx-1], c_data)])
+    print(data)
+
+    # x = np.arange(divi)
+    x = [1]
+    for i in range(1, len(score)):
+        x.append(TM.double_plus(x[0] , i))
+    
+
+    
+    # block에 따라 score 출력
+    # x축: 블록
+    # y축: 점수   
+    width = 0.5
+    c = ['slategrey', 'lightblue', 'cornflowerblue', 'royalblue', 'slateblue']
+
+    fig, ax = plt.subplots()
+    for idx in range(len(key_)):
+        #name_g = list(i.keys())
+        rects1 = ax.bar(x, data[len(key_)-idx-1], width, color=c[idx])
+        #for idx, item in enumerate(data):
+
+    plt.legend((key_))
+    x_l = [1]
+
+    for i in range(len(score)-1):
+        x_l.append(x_l[0] + (i+1))
+
+    plt.xticks(x_l, labels=label_name)
+    ax.set_ylabel('Scores')
+    ax.set_title('TEAMate')
+    plt.show()
+    #save_name = group_id
+    #plt.savefig('print_graph' + str(group_id))
 
 score = [{1750342024: 2.0, 1937944242: 0.0, 1739915236: 1.6}, {1750342024: 11.2, 1937944242: 0, 1739915236: 11.8}, {1750342024: 10.2, 1937944242: 24.1, 1739915236: 25.1}, {1750342024: 0, 1937944242: 1.0, 1739915236: 2.0}, {1750342024: 6.3, 1937944242: 0, 1739915236: 6.6}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 6.5, 1937944242: 0, 1739915236: 8.3}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}]
-print_graph(score, -472653938)
+print_graph_indi(score, -472653938)
