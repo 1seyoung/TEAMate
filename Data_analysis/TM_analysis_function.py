@@ -156,4 +156,3 @@ def main(group):
     result_score.append(name_score)
     print(result_score)
     return result_score
-

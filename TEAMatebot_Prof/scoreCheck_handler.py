@@ -143,7 +143,7 @@ class scoreCheckHandler():
             for k in range(0, len(key_)):
                 x[k] += 3
         
-        
+        plt.legend((key_))
         x_l = []
         x_l.append(int(len(key_)/2)+0.5)
         for i in range(len(score)-1):
