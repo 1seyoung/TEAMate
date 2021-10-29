@@ -78,10 +78,10 @@ class TelegramManager():
 		# Start the Bot
 		self.updater.start_polling()
 		self.se.simulate()
-		
+
 	def collect_photo(self, update: Update, context: CallbackContext) -> None:
 		msg = []
-		preprocessing_chat = "photophotophotophoto_hellophoto___"
+		preprocessing_chat = "photophotophotophoto_hellophoto____"
 		
 		msg.append(preprocessing_chat)
 		msg.append(str(update.message.date))
@@ -92,7 +92,7 @@ class TelegramManager():
 
 	def collect_file(self, update: Update, context: CallbackContext) -> None:
 		msg = []
-		preprocessing_chat = "filefilefilefilefilefile_hellofile___"
+		preprocessing_chat = "filefilefilefilefilefile_hellofile____"
 		
 		msg.append(preprocessing_chat)
 		msg.append(str(update.message.date))
