@@ -36,7 +36,7 @@ class scoreCheckHandler():
 
     def get_help(self):
         
-        return f"/scorecheck :  자신의 정보와 참가중인 팀 정보를 등록합니다. 그룹 채팅방에서는 사용할 수 없습니다. 봇을 친구 추가한 뒤 대화를 걸고 이용해주세요"
+        return f"/scorecheck : 팀의 참여도를 확인하고싶으면 클릭해주세요"
 
     def handle_score_check(self, update: Update, context: CallbackContext) -> int:
         update.message.reply_text("확인할 팀 코드를 입력해주세요")

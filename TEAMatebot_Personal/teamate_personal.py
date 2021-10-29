@@ -33,7 +33,6 @@ class TEAMatebot_Personal():
         self.state_map ={state:idx for idx, state in enumerate(telegram_states)}
         print(self.state_map)
         self.handlers =[
-                        #scoreCheckHandler(self.state_map,self.sh),
                         RegisterHandler(self.state_map,self.sh),
                         #SurveyHandler(self.state_map,self.sh)
                         InitHandler(self.state_map,self.sh)

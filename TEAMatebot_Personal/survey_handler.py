@@ -17,7 +17,7 @@ class SurveyHandler():
 
     def get_help(self):
         
-        return f"/team_register :  자신의 정보와 참가중인 팀 정보를 등록합니다. 그룹 채팅방에서는 사용할 수 없습니다. 봇을 친구 추가한 뒤 대화를 걸고 이용해주세요"
+        return f"/survey :  동료평가 시작 시 클릭해주세요!"
 
     def cancel(self, update: Update, context: CallbackContext) -> int:
         #이전으로 돌아가기
@@ -26,10 +26,3 @@ class SurveyHandler():
         update.message.reply_text("취소 되었습니다.")
         return ConversationHandler.END
         
-    def register_start(self,update: Update, context: CallbackContext) -> int:
-        if update.message.chat_id < 0:
-            context.bot.send_message(chat_id=update.message.chat_id, text="그룹채팅방에서는 사용할 수 없는 기능입니다. \n TEAMAtebot과의 개인 채팅을 이용해주세요 ")
-        else:
-            update.message.reply_text("학번을 입력해주세요.")
-            context.user_data['next_state'] = "GET_STUDENT_ID"
-            return self.state_map[context.user_data['next_state']]
