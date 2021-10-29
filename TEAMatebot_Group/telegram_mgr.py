@@ -44,11 +44,11 @@ class TelegramManager():
 
 	def greet(self, update: Update, context: CallbackContext) -> None:
 		"""Send a message when the command /start is issued."""
-		user = update.effective_user
-		update.message.reply_markdown_v2(
-		    fr'Hi {user.mention_markdown_v2()}\!',
-		    reply_markup=ForceReply(selective=True),
-		)
+		update.message.reply_text("안녕하세요 TEAMate의 그룹 봇입니다.\n먼저 @teamate_user_setting_bot 을 통해 사용자 등록을 해주세요!\n등록 후 /info_teamate 를 클릭하여 그룹 봇의 사용법을 확인하세요")
+
+	def info(self, update: Update, context: CallbackContext) -> None:
+		"""Send a message when the command /start is issued."""
+		update.message.reply_text("사용자 등록을 끝내셨나요?\n그렇다면 팀 등록을 진행합니다.\n/classcode 를 클릭하여 모두 서버에 팀을 등록해야합니다. 모든 학생이 실행해주세요\n")
 
 	def update_freq(self, update: Update, context: CallbackContext) -> None:
 		print(update.message.text)
@@ -66,16 +66,40 @@ class TelegramManager():
 
 		# on different commands - answer in Telegram
 		dispatcher.add_handler(CommandHandler("start", self.greet))
+		dispatcher.add_handler(CommandHandler("info_teamate", self.info))
 		dispatcher.add_handler(CommandHandler("update", self.update_freq))
 		dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, self.collect_msg))
+		dispatcher.add_handler(MessageHandler(Filters.photo& ~Filters.command,self.collect_photo))
+		dispatcher.add_error_handler(MessageHandler(Filters.document& ~Filters.command, self.collect_file))
 		dispatcher.add_handler(ConversationHandler(
 			entry_points=[CommandHandler("classcode", self.handle_register_start)],states={
 				self.state_map["GET_STUDENT_ID"]:[CommandHandler("code_add",self.get_stu_id)]
 			},fallbacks=[CommandHandler('cancel', self.cancel)],))
 		# Start the Bot
-
 		self.updater.start_polling()
 		self.se.simulate()
+		
+	def collect_photo(self, update: Update, context: CallbackContext) -> None:
+		msg = []
+		preprocessing_chat = "photophotophotophoto_hellophoto___"
+		
+		msg.append(preprocessing_chat)
+		msg.append(str(update.message.date))
+		msg.append((update.message.chat_id))
+		msg.append((update.effective_user.id))
+
+		self.se.insert_custom_external_event("msg", msg)
+
+	def collect_file(self, update: Update, context: CallbackContext) -> None:
+		msg = []
+		preprocessing_chat = "filefilefilefilefilefile_hellofile___"
+		
+		msg.append(preprocessing_chat)
+		msg.append(str(update.message.date))
+		msg.append((update.message.chat_id))
+		msg.append((update.effective_user.id))
+
+		self.se.insert_custom_external_event("msg", msg)
 
 	def collect_msg(self, update: Update, context: CallbackContext) -> None:
 		print("SDF")
@@ -108,6 +132,7 @@ class TelegramManager():
 		self.classcode_add(update.message.chat.title,update.effective_user.id,update.message.chat_id)
 
 		update.message.reply_text("등록이 완료되었습니다.")
+
 		
 	def classcode_add(self, classcode,user_id,group_id) -> None:
 		gc = pygsheets.authorize(service_file=GOOGLE_SERVICE_KEY)
