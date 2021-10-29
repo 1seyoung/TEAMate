@@ -148,7 +148,7 @@ class scoreCheckHandler():
         x_l.append(int(len(key_)/2)+0.5)
         for i in range(len(score)-1):
             x_l.append(x_l[0] + 3*(i+1))
-        
+
         plt.xticks(x_l, labels=label_name)
         ax.set_ylabel('Scores')
         ax.set_title('TEAMate')
@@ -248,7 +248,7 @@ def print_graph_indi(score, group_id):
         #name_g = list(i.keys())
         rects1 = ax.bar(x, data[len(key_)-idx-1], width, color=c[idx])
         #for idx, item in enumerate(data):
-  
+
     plt.legend((key_))
     x_l = [1]
 
