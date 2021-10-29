@@ -1,0 +1,25 @@
+# Figure
+figure.figsize: 24, 8
+savefig.dpi : 300
+
+# Font Properties
+font.family: Helvetica
+font.size: 10
+
+# Axes Properties
+axes.titlesize : 24
+axes.labelsize : 10
+axes.labelcolor : (0.1, 0.1, 0.1)
+axes.linewidth : 1
+#axes.spines.top : False
+#axes.spines.right : False
+#axes.spines.bottom : True
+#axes.spines.left : True 
+
+axes.prop_cycle: cycler(color=['008fd5', 'fc4f30', 'e5ae38','6d904f','8b8b8b','810f7c'])
+
+# Grid Properties
+axes.grid : True
+grid.alpha : 0.7
+grid.linestyle : --
+grid.linewidth : 0.6
