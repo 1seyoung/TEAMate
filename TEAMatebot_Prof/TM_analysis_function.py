@@ -9,43 +9,43 @@ import copy
 #import TM_analysis_graph_ as graph
 
 def make_df(group_id):
-    pd.set_option('mode.chained_assignment',  None)
-    json_file_name = 'fit-union-324504-8305b813e2b8.json'
+  pd.set_option('mode.chained_assignment',  None)
+  json_file_name = 'fit-union-324504-8305b813e2b8.json'
 
-    spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1-FrwLOMx47lTOZuQZfxKdHxDl1w-HC0AvYhXv22LWGM/edit?usp=sharing'
+  spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1-FrwLOMx47lTOZuQZfxKdHxDl1w-HC0AvYhXv22LWGM/edit?usp=sharing'
 
-    gc = pygsheets.authorize(service_file=json_file_name)
-    sh = gc.open('TM_DB')
-    wks = sh.worksheet('title','chat_data')
-    chat_df = wks.get_as_df()
-    chat_df['Datetime'] = pd.to_datetime(chat_df['Datetime'])
+  gc = pygsheets.authorize(service_file=json_file_name)
+  sh = gc.open('TM_DB')
+  wks = sh.worksheet('title','chat_data')
+  chat_df = wks.get_as_df()
+  chat_df['Datetime'] = pd.to_datetime(chat_df['Datetime'])
 
-    group_chat_df = chat_df.loc[chat_df["group_id"]==group_id]
+  group_chat_df = chat_df.loc[chat_df["group_id"]==group_id]
 
-    group_chat_df['timegap'] = (group_chat_df.Datetime - group_chat_df.Datetime.shift())
+  group_chat_df['timegap'] = (group_chat_df.Datetime - group_chat_df.Datetime.shift())
 
-    group_chat_df= group_chat_df.assign(timeblock = lambda x:(x['timegap']> timedelta(seconds=600)).cumsum() )
-    group_chat_df = group_chat_df.dropna(axis=0)
-    #print(group_chat_df)
-    group_chat_df = group_chat_df.reset_index()
-    group_chat_df = group_chat_df.drop(columns = ['index'])
+  group_chat_df= group_chat_df.assign(timeblock = lambda x:(x['timegap']> timedelta(seconds=600)).cumsum() )
+  group_chat_df = group_chat_df.dropna(axis=0)
+  #print(group_chat_df)
+  group_chat_df = group_chat_df.reset_index()
+  group_chat_df = group_chat_df.drop(columns = ['index'])
 
-    stick = [] 
-    for i in range(0, len(group_chat_df)-1) :
-        if group_chat_df.at[i,'user_id'] == group_chat_df.at[i+1, 'user_id'] and group_chat_df.at[i, 'timeblock'] == group_chat_df.at[i+1,'timeblock'] :
-            stick.append(i+1)
-    stick.reverse()
+  stick = [] 
+  for i in range(0, len(group_chat_df)-1) :
+      if group_chat_df.at[i,'user_id'] == group_chat_df.at[i+1, 'user_id'] and group_chat_df.at[i, 'timeblock'] == group_chat_df.at[i+1,'timeblock'] :
+          stick.append(i+1)
+  stick.reverse()
 
-    for i in stick :
-        group_chat_df.at[i-1, 'chat'] += group_chat_df.at[i,'chat']
-        group_chat_df.at[i, 'chat'] = NaN
-        group_chat_df = group_chat_df.dropna(axis=0)
+  for i in stick :
+      group_chat_df.at[i-1, 'chat'] += group_chat_df.at[i,'chat']
+      group_chat_df.at[i, 'chat'] = NaN
+      group_chat_df = group_chat_df.dropna(axis=0)
 
-    
-    group_chat_df = group_chat_df.reset_index()
-    group_chat_df = group_chat_df.drop(columns = ['index'])
-    
-    return group_chat_df
+  
+  group_chat_df = group_chat_df.reset_index()
+  group_chat_df = group_chat_df.drop(columns = ['index'])
+  
+  return group_chat_df
 
 def timeblock_starter(data_text):
     time_check = list(data_text['timeblock'])
@@ -154,6 +154,8 @@ def main(group):
       name_score = set_score(data_text.loc[i, :], name_score)
           
     result_score.append(name_score)
+
+
     print(result_score)
     return result_score
 
