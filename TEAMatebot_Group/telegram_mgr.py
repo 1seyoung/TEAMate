@@ -70,7 +70,7 @@ class TelegramManager():
 		dispatcher.add_handler(CommandHandler("update", self.update_freq))
 		dispatcher.add_handler(MessageHandler(Filters.text & ~Filters.command, self.collect_msg))
 		dispatcher.add_handler(MessageHandler(Filters.photo& ~Filters.command,self.collect_photo))
-		dispatcher.add_error_handler(MessageHandler(Filters.document& ~Filters.command, self.collect_file))
+		dispatcher.add_handler(MessageHandler(Filters.document& ~Filters.command, self.collect_file))
 		dispatcher.add_handler(ConversationHandler(
 			entry_points=[CommandHandler("classcode", self.handle_register_start)],states={
 				self.state_map["GET_STUDENT_ID"]:[CommandHandler("code_add",self.get_stu_id)]
@@ -81,7 +81,7 @@ class TelegramManager():
 
 	def collect_photo(self, update: Update, context: CallbackContext) -> None:
 		msg = []
-		preprocessing_chat = "photophotophotophoto_hellophoto____"
+		preprocessing_chat = "photophotophotophotohellophoto"
 		
 		msg.append(preprocessing_chat)
 		msg.append(str(update.message.date))
@@ -92,7 +92,7 @@ class TelegramManager():
 
 	def collect_file(self, update: Update, context: CallbackContext) -> None:
 		msg = []
-		preprocessing_chat = "filefilefilefilefilefile_hellofile____"
+		preprocessing_chat = "filefilefilefilefilefilehellofile"
 		
 		msg.append(preprocessing_chat)
 		msg.append(str(update.message.date))
