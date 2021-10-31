@@ -1,7 +1,7 @@
 
-from telegram import Update
-from telegram.ext import Dispatcher,CommandHandler,MessageHandler,Filters,ConversationHandler,CallbackContext
-
+from telegram import Update, replymarkup
+from telegram.ext import Dispatcher,CommandHandler,MessageHandler,Filters,ConversationHandler,CallbackContext,CallbackQueryHandler
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from pygsheets import Spreadsheet
 class SurveyHandler():
@@ -13,26 +13,25 @@ class SurveyHandler():
         #conversationhandler code
 
         self.handler = ConversationHandler(
-            entry_points=[CommandHandler('survey', self.handle_score_check)],
+            entry_points=[CommandHandler('survey', self.check_user)],
             states={
+                self.qstate_map["PWD_CHECKED"]:[
+                    MessageHandler(
+                        Filters.text & ~(Filters.command), self.handle_check_password
+                    )
+                ],
+                self.qstate_map["CODE_CHECKED"]:[
+                    MessageHandler(
+                        Filters.text & ~(Filters.command), self.handle_check_classcode
+                    )
+                ],
                 self.qstate_map["Q1"]:[
-                    MessageHandler(Filters.regex(r'\w+'), self.handle_check_team)
+                    CallbackQueryHandler(self.Q1)
                 ],
-                self.qstate_map["Q2"]: [
-                    CommandHandler(
-                        'teamscore', self.get_graph
-                    )
-                ],
-                self.qstate_map["Q3"]: [
-                    CommandHandler(
-                        'teamscore', self.get_graph
-                    )
-                ],
-                self.qstate_map["Q4"]: [
-                    CommandHandler(
-                        'teamscore', self.get_graph
-                    )
-                ],
+                self.qstate_map["Q2"]:[
+                    CallbackQueryHandler(self.Q2)
+                ]
+                
             },
             fallbacks=[CommandHandler('cancel', self.cancel)],
         )
@@ -41,7 +40,7 @@ class SurveyHandler():
 
     def get_help(self):
         
-        return f"/survey :  동료평가 시작 시 클릭해주세요!"
+        return f"/survey 이름 : 동료평가 시작 시 입력해주세요 클릭말고 양식대로 입력해주시기바랍니다. EX)/survey 홍길동"
 
     def cancel(self, update: Update, context: CallbackContext) -> int:
         #이전으로 돌아가기
@@ -50,3 +49,97 @@ class SurveyHandler():
         update.message.reply_text("취소 되었습니다.")
         return ConversationHandler.END
         
+    def check_user(self, update: Update, context: CallbackContext) -> int:
+        wks = self.sh.worksheet('title','참여자 정보')
+        df =wks.get_as_df()
+
+        user_data = df.index[df['user_id']==update.effective_user.id].tolist()
+        if user_data[0]>0:
+            update.message.reply_text("등록된 사용자입니다. 동료평가를 진행하려면 비밀번호를 입력해주세요")
+            context.user_data['next_state'] = "PWD_CHECKED"
+            context.user_data['row'] = user_data[0] + 2
+            return self.qstate_map[context.user_data['next_state']]
+        else:
+            update.message.reply_text("등록되지 않은 사용자입니다. 교수님께 문의하세요.")
+            return ConversationHandler.END
+    
+    def handle_check_password(self, update: Update, context: CallbackContext) -> int:
+        wks = self.sh.worksheet('title','참여자 정보')
+        if wks.get_value('F'+str(context.user_data['row']))==update.message.text:
+            update.message.reply_text("인증 완료! classcode를 입력해주세요")
+            context.user_data['next_state'] = "CODE_CHECKED"
+            return self.qstate_map[context.user_data['next_state']]
+        else:
+            update.message.reply_text("비밀번호가 맞지 않습니다. 다시 입력해주세요!")
+            context.user_data['next_state'] = "PWD_CHECKED"
+            return self.qstate_map[context.user_data['next_state']]
+
+    def handle_check_classcode(self, update: Update, context: CallbackContext) -> int:
+        wks = self.sh.worksheet('title','참여자 정보')
+        df =wks.get_as_df()
+        if wks.get_value('E'+str(context.user_data['row']))==update.message.text:
+            context.user_data['classcode'] = update.message.text
+            context.user_data['name']=wks.get_value('B'+str(context.user_data['row']))
+            context.user_data['group_id']= wks.get_value('D'+str(context.user_data['row']))
+            context.user_data['stu_id']= wks.get_value('A'+str(context.user_data['row']))
+            context.user_data['next_state'] = "Q1"
+            
+            
+            reply_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton("예", callback_data='yes')],
+                [InlineKeyboardButton("아니오", callback_data='no')],
+            ])
+            self.__classcode=context.user_data['classcode']
+            self.__name=context.user_data['name']
+            self.__stuid =context.user_data['stu_id']
+            self.__groupid =context.user_data['group_id']
+
+            team_data_index=df.index[df['classcode'] == self.__classcode].tolist()
+            
+            self.team_data = {}
+            for index in team_data_index:
+                team_user_id=wks.get_value('C'+str(index+2))
+                team_user_name=wks.get_value('B'+str(index+2))
+                self.team_data[team_user_id] = team_user_name
+            print(self.team_data)
+            update.message.reply_text(text=f"classcode : {self.__classcode}\n학번 : {self.__stuid}\n이름 : {self.__name} \n동료평가를 시작하시겠습니까?",reply_markup=reply_markup)
+            return self.qstate_map[context.user_data['next_state']]            
+    def Q1(self, update: Update, context: CallbackContext) -> int:
+        query = update.callback_query
+        chat_id = query.message.chat_id
+
+        if query.data == "yes":
+            update.edit_message_text(
+                chat_id=chat_id,
+                message_id=query.message.message_id,
+                text="무임승차자가 있었나요? 다음 선택지에서 골라주세요"
+            )
+            reply_list = [InlineKeyboardButton("없음",callback_data="none")]
+            for key,value in self.team_data.items():
+                reply_list.append(InlineKeyboardButton(value,callback_data=key))
+            reply_markup = InlineKeyboardMarkup(reply_list)   
+            update.edit_message_reply_markup(
+                chat_id=chat_id,
+                message_id = query.message.message_id,
+                reply_markup=reply_markup
+            )
+            
+            context.user_data['next_state'] = "Q2"
+            return self.qstate_map[context.user_data['next_state']]
+    def Q2(self, update: Update, context: CallbackContext) -> int:
+        pass
+
+    def class_group_list(self,class_id):
+        
+        wks = self.sh.worksheet('title','참여자 정보')
+
+        
+        df = wks.get_as_df()
+        
+        user_data=df.index[df['classcode'] == class_id].tolist()
+        
+
+        group_id =wks.get_value('D'+str(user_data[0]+2))
+        #user_df = user_df.loc['classcode' == str(class_id)]
+        print(group_id)
+        return group_id
