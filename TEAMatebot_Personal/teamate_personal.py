@@ -8,8 +8,8 @@ from telegram.ext import Updater, CallbackContext,MessageHandler,Filters,Command
 from register_handler import RegisterHandler
 from survey_handler import SurveyHandler
 from init_handler import InitHandler
-from states import STATES
-from states import QSTATES
+from states import STATES,QSTATES
+
 
 from config import *
 from instance.config import *
@@ -31,8 +31,8 @@ class TEAMatebot_Personal():
  
  
         self.state_map ={state:idx for idx, state in enumerate(telegram_states)}
-        self.state_map ={state:idx for idx, state in enumerate(q_states)}
-        print(self.state_map)
+        self.qstate_map ={state:idx for idx, state in enumerate(q_states)}
+        
         self.handlers =[
                         RegisterHandler(self.state_map,self.sh),
                         SurveyHandler(self.qstate_map,self.sh),
