@@ -126,5 +126,3 @@ def contribute_up(score, group_id) :
     for index, row in score_df.iterrows() :
         p_value = list(row)
         wks.update_row(index+2, p_value)
-
-    return 0

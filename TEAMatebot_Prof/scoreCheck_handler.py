@@ -251,7 +251,7 @@ class scoreCheckHandler():
         # x축: 블록
         # y축: 점수   
         width = 0.5
-        c = ['lavenderblush', 'thistle', 'lightpink', 'plum', 'paleviletred']
+        c = ['lavenderblush', 'thistle', 'lightpink', 'plum', 'palevioletred']
         fig, ax = plt.subplots()
         data = result_score_df['result'].tolist()
         rects1 = ax.bar(x, data, width, color=c)
@@ -281,4 +281,3 @@ class scoreCheckHandler():
         for index, row in score_df.iterrows() :
             p_value = list(row)
             wks.update_row(index+2, p_value)
-    
