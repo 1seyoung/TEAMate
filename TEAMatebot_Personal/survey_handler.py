@@ -2,8 +2,14 @@
 from telegram import Update, replymarkup
 from telegram.ext import Dispatcher,CommandHandler,MessageHandler,Filters,ConversationHandler,CallbackContext,CallbackQueryHandler
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
-
-from pygsheets import Spreadsheet
+import re
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+from bob_telegram_tools.bot import TelegramBot
+from decimal import Decimal
+import copy
+from pygsheets import *
 class SurveyHandler():
     def __init__(self, qstate_map:dict, sh:Spreadsheet):
         self.qstate_map = qstate_map
@@ -167,11 +173,11 @@ class SurveyHandler():
 
                 elif aquery.data == "j":
 
-                    self.user_score[key] = value +3
+                    self.user_score[key] = value +4
                 
                 elif aquery.data == "h":
 
-                    self.user_score[key] = value +1
+                    self.user_score[key] = value +3
                 else:
                     pass
 
@@ -219,7 +225,39 @@ class SurveyHandler():
         print(self.user_score)
         update.callback_query.message.edit_text(text="동료평가를 종료합니다.")
         print(self.user_score)
+        user = self.user_score
+        group = self.__groupid
+        self.contribute_up(user, group)
         return ConversationHandler.END
+    def print_score_df(self, group_id): ## group id를 넣으면 group id만 있는 pandas 출력
+        wks = self.sh.worksheet('title','팀평가')
+        score_df = wks.get_as_df()
+        score_df = score_df.loc[score_df['group_id'] == group_id]
+        return score_df
+    def contribute_up(self, score, group_id) : ## group id랑 새로운 score -> dictionary를 넣으면 이전의 데이터베이스 값과 합쳐서 입력
+        score_df = self.print_score_df(group_id)
+        print(score_df)
+        contribute = score_df['contribute'].tolist()
+        key_ = list(score.keys())
 
+        print("why?")
+        print(score)
+        print(score_df)
+        for idx, i in enumerate(key_) :
+            contribute[idx] += score[i]
+        score_df = score_df.drop(['contribute'], axis =1)
+        print(score_df)
+        score_df.insert(3, 'contribute', contribute)
+        json_file_name = 'fit-union-324504-8305b813e2b8.json'
+        pd.set_option('mode.chained_assignment',  None)
+        spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1-FrwLOMx47lTOZuQZfxKdHxDl1w-HC0AvYhXv22LWGM/edit?usp=sharing'
+
+        gc = authorize(service_file=json_file_name)
+        sh = gc.open('TM_DB')
+        wks = sh.worksheet('title','팀평가')
+        
+        for index, row in score_df.iterrows() :
+            p_value = list(row)
+            wks.update_row(index+2, p_value)
     
 
