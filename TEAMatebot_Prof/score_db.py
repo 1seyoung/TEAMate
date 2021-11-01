@@ -1,6 +1,5 @@
 import re
-from telegram import Update
-from telegram.ext import Dispatcher,CommandHandler,MessageHandler,Filters,ConversationHandler,CallbackContext 
+from telegram import *
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -83,14 +82,17 @@ def grade(group_id) :
     score_df = print_score_df(group_id)
 
     user = score_df['user_id'].tolist()
-    analysis = score_df['anaylsis'].tolist()
+    analysis = score_df['analysis'].tolist()
     contribute = score_df['contribute'].tolist()
     outcome =  score_df['outcome'].tolist()
     result = []
     for i in range(len(user)) :
-        result.append(analysis[i]*(2*contribute*outcome))
-    
+        result.append(int(analysis[i])*(2*int(contribute[i])*int(outcome[i])))
+
+    result_print_graph(-3333)
+
 score = [{1750342024: 2.0, 1937944242: 0.0, 1739915236: 1.6}, {1750342024: 11.2, 1937944242: 0, 1739915236: 11.8}, {1750342024: 10.2, 1937944242: 24.1, 1739915236: 25.1}, {1750342024: 0, 1937944242: 1.0, 1739915236: 2.0}, {1750342024: 6.3, 1937944242: 0, 1739915236: 6.6}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 6.5, 1937944242: 0, 1739915236: 8.3}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}]
-analysis_score_update(score, -3333)
+#analysis_score_update(score, -3333)
 #print_score_df(-472653938)
 #result_print_graph(-472653938)
+grade(-3333)

@@ -86,9 +86,12 @@ class scoreCheckHandler():
         group_idd = int(group)
         result_score = TM.main(group_idd)
         self.print_graph(result_score, group)
+        self.print_graph_indi(result_score,group)
         png_name = 'print_graph' + str(group) + '.png'
+        png_name_indi = 'print_graph' + str(group) + '_indi.png'
         cv2.imread('png_name', cv2.IMREAD_COLOR)
         context.bot.send_photo(chat_id=update.effective_user.id, photo=open(png_name, 'rb'))
+        context.bot.send_photo(chat_id=update.effective_user.id, photo=open(png_name_indi, 'rb'))
         return ConversationHandler.END
 
     def class_group_list(self,class_id):
@@ -225,11 +228,13 @@ def print_graph_indi(score, group_id):
         c_data = []
         for j in score :
             c_data.append(j[i])
+        data.append(c_data)
+        """
         if idx == 0 :  ## if else 지우기
             data.append(c_data)
         else : 
             data.append([x+y for x,y in zip(data[idx-1], c_data)])
-    print(data)
+        """
 
     # x = np.arange(divi)
     x = [1]
@@ -242,22 +247,16 @@ def print_graph_indi(score, group_id):
     # y축: 점수   
     width = 0.5
     c = ['slategrey', 'lightblue', 'cornflowerblue', 'royalblue', 'slateblue']
-
-    fig, ax = plt.subplots()
-    for idx in range(len(key_)):
-        #name_g = list(i.keys())
-        rects1 = ax.bar(x, data[len(key_)-idx-1], width, color=c[idx])
-        #for idx, item in enumerate(data):
-
-    plt.legend((key_))
     x_l = [1]
 
     for i in range(len(score)-1):
         x_l.append(x_l[0] + (i+1))
 
-    plt.xticks(x_l, labels=label_name)
-    ax.set_ylabel('Scores')
-    ax.set_title('TEAMate')
-    plt.show()
-    #save_name = group_id
-    #plt.savefig('print_graph' + str(group_id))
+    fig, ax = plt.subplots(len(key_))
+    for idx in range(len(key_)):
+        #name_g = list(i.keys())
+        rects1 = ax[idx].bar(x, data[len(key_)-idx-1], width, color=c[idx])
+        plt.xticks(x_l, labels=label_name)
+        #for idx, item in enumerate(data):
+    save_name = str(group_id) + "_indi"
+    plt.savefig('print_graph_' + save_name)
