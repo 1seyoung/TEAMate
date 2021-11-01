@@ -84,15 +84,47 @@ def grade(group_id) :
     user = score_df['user_id'].tolist()
     analysis = score_df['analysis'].tolist()
     contribute = score_df['contribute'].tolist()
+    contri = []
+    for i in contribute :
+        contri.append(round(i/len(contribute), 1))
     outcome =  score_df['outcome'].tolist()
     result = []
     for i in range(len(user)) :
-        result.append(int(analysis[i])*(2*int(contribute[i])*int(outcome[i])))
+        result.append(int(analysis[i])*(2*int(contri[i])*int(outcome[i])))
+    score_df= score_df.drop(['result'], axis = 1)
+    score_df['result'] = result
 
-    result_print_graph(-3333)
+    json_file_name = 'fit-union-324504-8305b813e2b8.json'
+    pd.set_option('mode.chained_assignment',  None)
+    spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1-FrwLOMx47lTOZuQZfxKdHxDl1w-HC0AvYhXv22LWGM/edit?usp=sharing'
 
-score = [{1750342024: 2.0, 1937944242: 0.0, 1739915236: 1.6}, {1750342024: 11.2, 1937944242: 0, 1739915236: 11.8}, {1750342024: 10.2, 1937944242: 24.1, 1739915236: 25.1}, {1750342024: 0, 1937944242: 1.0, 1739915236: 2.0}, {1750342024: 6.3, 1937944242: 0, 1739915236: 6.6}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 6.5, 1937944242: 0, 1739915236: 8.3}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}, {1750342024: 0, 1937944242: 0, 1739915236: 1.0}]
-#analysis_score_update(score, -3333)
-#print_score_df(-472653938)
-#result_print_graph(-472653938)
-grade(-3333)
+    gc = pygsheets.authorize(service_file=json_file_name)
+    sh = gc.open('TM_DB')
+    wks = sh.worksheet('title','팀평가')
+    
+    for index, row in score_df.iterrows() :
+        p_value = list(row)
+        wks.update_row(index+2, p_value)
+def contribute_up(score, group_id) :
+    score_df = print_score_df(group_id)
+    contribute = score_df['contribute'].tolist()
+    key_ = list(score.keys())
+
+    for idx, i in enumerate(key_) :
+        contribute[idx] += score[i]
+    score_df = score_df.drop(['contribute'], axis =1)
+    print(score_df)
+    score_df.insert(3, 'contribute', contribute)
+    json_file_name = 'fit-union-324504-8305b813e2b8.json'
+    pd.set_option('mode.chained_assignment',  None)
+    spreadsheet_url = 'https://docs.google.com/spreadsheets/d/1-FrwLOMx47lTOZuQZfxKdHxDl1w-HC0AvYhXv22LWGM/edit?usp=sharing'
+
+    gc = pygsheets.authorize(service_file=json_file_name)
+    sh = gc.open('TM_DB')
+    wks = sh.worksheet('title','팀평가')
+    
+    for index, row in score_df.iterrows() :
+        p_value = list(row)
+        wks.update_row(index+2, p_value)
+
+    return 0

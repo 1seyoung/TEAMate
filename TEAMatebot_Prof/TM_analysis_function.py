@@ -89,7 +89,7 @@ def set_score(text, name_score) :
   ty = 'no_ping'
   if text['comunication'] == True :
     ty = 'timeblock'
-  if str(text['chat']).startswith('파일: ') :
+  if str(text['chat']) == 'photophotophotophotohellophoto' and str(text['chat']) == 'filefilefilefilefilefilehellofile'  :
     ty = 'file'
 
   name_score[text['user_id']] = double_plus(all_score(ty, count), name_score[text['user_id']])
