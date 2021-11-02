@@ -56,7 +56,7 @@ def print_graph(score, group_id):
     #save_name = group_id
     #plt.savefig('print_graph' + str(group_id))
 
-def print_graph_indi(score, group_id):
+def print_graph_indi(score, group_id, aver):
     avg = []
     for i in score :
         value = list(i.values())
@@ -104,11 +104,12 @@ def print_graph_indi(score, group_id):
     for idx in range(len(key_)):
         #name_g = list(i.keys())
         rects1 = ax[idx].bar(x, data[len(key_)-idx-1], width, color=c[idx])
+        ax[idx].plot(x, aver)
         plt.xticks(x_l, labels=label_name)
         #for idx, item in enumerate(data):
-    plt.show()
-    #save_name = str(group_id) + "_indi"
-    #plt.savefig('print_graph_' + save_name)
+    #plt.show()
+    save_name = str(group_id) + "_indi"
+    plt.savefig('print_graph_' + save_name)
 
 def result_print_graph(score, group_id):
     #result_score_df = self.print_score_df(group_id)
@@ -167,7 +168,8 @@ score = [{'user1' : 21.0, 'user2' : 35.0, 'user3' : 19.0, 'user4' : 28.0, 'user5
 {'user1' : 1.3, 'user2' : 22.0, 'user3' : 12.0, 'user4' : 17.0, 'user5' : 1.2},
 {'user1' : 0.0, 'user2' : 8.0, 'user3' : 1.9, 'user4' : 4.0, 'user5' : 2.2}]
 
+aver = [23.84,7.0,7.2,3.5, 5.56, 4.52, 5.6, 4.2, 2.48, 5.04, 4.14, 1.5, 9.16, 5.2, 10.72, 3.1]
 gra = grade(score, analysis, contri, outcome, -1233)
 result_print_graph(gra, -1233)
 print_graph(score, -1333)
-print_graph_indi(score, -1333)
+print_graph_indi(score, -1333, aver)
