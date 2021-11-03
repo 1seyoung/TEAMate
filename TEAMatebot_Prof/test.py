@@ -10,6 +10,10 @@ from bob_telegram_tools.bot import TelegramBot
 from pygsheets import *
 
 def print_graph(score, group_id):
+    plt.style.use('default')
+    plt.rcParams['figure.figsize'] = (15,7)
+    plt.rcParams['font.size'] = 12
+
     label_name=[]
     key_ = score[0].keys()
     #value_ = []
@@ -51,12 +55,16 @@ def print_graph(score, group_id):
 
     plt.xticks(x_l, labels=label_name)
     ax.set_ylabel('Scores')
-    ax.set_title('TEAMate')
-    plt.show()
-    #save_name = group_id
-    #plt.savefig('print_graph' + str(group_id))
+    ax.set_title('Analysis Score')
+    #plt.show()
+    save_name = group_id
+    plt.savefig('print_graph' + str(group_id))
 
 def print_graph_indi(score, group_id, aver):
+    plt.style.use('default')
+    plt.rcParams['figure.figsize'] = (7, 15)
+    plt.rcParams['font.size'] = 12
+
     avg = []
     for i in score :
         value = list(i.values())
@@ -108,10 +116,16 @@ def print_graph_indi(score, group_id, aver):
         plt.xticks(x_l, labels=label_name)
         #for idx, item in enumerate(data):
     #plt.show()
+
+    ax[0].set_title('Individual Anaylsis Score')
     save_name = str(group_id) + "_indi"
     plt.savefig('print_graph_' + save_name)
 
 def result_print_graph(score, group_id):
+    plt.style.use('default')
+    plt.rcParams['figure.figsize'] = (9, 6)
+    plt.rcParams['font.size'] = 12
+
     #result_score_df = self.print_score_df(group_id)
     label_name=[]
     
@@ -136,10 +150,10 @@ def result_print_graph(score, group_id):
     x_l = x
     plt.xticks(x_l, label_name)
     ax.set_ylabel('result_Scores')
-    ax.set_title('TEAMate')
-    plt.show()
-    #save_name = str(group_id)
-    #plt.savefig('result_print_graph_' + save_name)
+    ax.set_title('Result(Anaslysis, Contribute, Outcome)')
+    #plt.show()
+    save_name = str(group_id)
+    plt.savefig('result_print_graph_' + save_name)
 
 def grade(score, analysis, contri, outcome,  group_id) :
     result = []
@@ -170,6 +184,6 @@ score = [{'user1' : 21.0, 'user2' : 35.0, 'user3' : 19.0, 'user4' : 28.0, 'user5
 
 aver = [23.84,7.0,7.2,3.5, 5.56, 4.52, 5.6, 4.2, 2.48, 5.04, 4.14, 1.5, 9.16, 5.2, 10.72, 3.1]
 gra = grade(score, analysis, contri, outcome, -1233)
-result_print_graph(gra, -1233)
+result_print_graph(gra, -1333)
 print_graph(score, -1333)
 print_graph_indi(score, -1333, aver)

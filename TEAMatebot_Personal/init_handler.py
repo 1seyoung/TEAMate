@@ -68,11 +68,12 @@ class InitHandler():
     def handle_change_password(self, update: Update, context: CallbackContext) -> int:
         user_id = int(update.message.text)
         
-        if (row := self.check_valid_user(user_id)) > 0:
+        if (row := self.check_valid_user(user_id)) >= 0:
             context.user_data['id'] = user_id        
             context.user_data['row'] = row +2
-
+            (context.user_data['row'])
             if self.check_register_user(context.user_data['row']):
+                
                 update.message.reply_text("이미 등록되어 있는 사용자입니다.\n비밀번호를 초기화하기 위해서는 담당교수님께 연락바랍니다.")
                 context.user_data.clear()
                 return ConversationHandler.END
@@ -90,7 +91,7 @@ class InitHandler():
         wks = self.sh.worksheet('title','참여자 정보')
         wks.update_value('F'+str(context.user_data['row']), update.message.text)
         
-        update.message.reply_text("새로운 비밀번호가 등록되었습니다.\n사용자등록을 해주시길 바랍니다.")
+        update.message.reply_text("새로운 비밀번호가 등록되었습니다.\n/register 을 클릭하여 사용자등록을 해주시길 바랍니다.")
         
         context.user_data.clear()
         return ConversationHandler.END

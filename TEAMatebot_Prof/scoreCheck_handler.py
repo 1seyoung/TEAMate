@@ -50,7 +50,7 @@ class scoreCheckHandler():
         user_data = df.index[df['classcode'] == team_id].tolist()
         print(user_data)
         if user_data:
-            return user_data[0]
+            return user_data[0]+2
         else:
             return -1
 
@@ -82,17 +82,22 @@ class scoreCheckHandler():
         return ConversationHandler.END
 
     def get_graph(self,update: Update, context: CallbackContext) -> int:
-        group = self.class_group_list(self.team_id)
-        group_idd = int(group)
-        result_score = TM.main(group_idd)
-        self.print_graph(result_score, group)
-        self.analysis_score_update(result_score, group)
-        self.print_graph_indi(result_score,group)
+        #group = self.class_group_list(self.team_id)
+        #group_idd = int(group)
+        #result_score = TM.main(group_idd)
+        #self.print_graph(result_score, group)
+        #self.analysis_score_update(result_score, group)
+        #self.print_graph_indi(result_score,group)
+        group = -1333
         png_name = 'print_graph' + str(group) + '.png'
-        png_name_indi = 'print_graph' + str(group) + '_indi.png'
+        png_name_indi = 'print_graph_' + str(group) + '_indi.png'
+        png_name_result = 'result_print_graph_'+str(group)+'.png'
         cv2.imread('png_name', cv2.IMREAD_COLOR)
         context.bot.send_photo(chat_id=update.effective_user.id, photo=open(png_name, 'rb'))
+        cv2.imread('png_name_indi', cv2.IMREAD_COLOR)
         context.bot.send_photo(chat_id=update.effective_user.id, photo=open(png_name_indi, 'rb'))
+        cv2.imread('png_name_result', cv2.IMREAD_COLOR)
+        context.bot.send_photo(chat_id=update.effective_user.id, photo=open(png_name_result, 'rb'))
         return ConversationHandler.END
 
     def class_group_list(self,class_id):
